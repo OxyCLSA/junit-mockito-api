@@ -3,6 +3,7 @@ package br.com.testesunitarios.services.implementation;
 import br.com.testesunitarios.domain.User;
 import br.com.testesunitarios.repositories.UserRepository;
 import br.com.testesunitarios.services.UserService;
+import br.com.testesunitarios.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
     @Override
-    public User findById(int id) {
+    public User findById(Long id) {
         Optional<User> obj = repository.findById(id);
-        return obj.orElse(null);
+        return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado"));
+
     }
 }
