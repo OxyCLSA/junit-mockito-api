@@ -3,6 +3,7 @@ package br.com.testesunitarios.services.implementation;
 import br.com.testesunitarios.domain.User;
 import br.com.testesunitarios.domain.dto.UserDTO;
 import br.com.testesunitarios.repositories.UserRepository;
+import br.com.testesunitarios.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void wnheFindByIdThenReturnAnUserInstance() {
+    void whenFindByIdThenReturnAnUserInstance() {
         when(repository.findById(anyLong())).thenReturn(optionalUser);
 
         User response = service.findById(ID);
@@ -58,6 +59,18 @@ class UserServiceImplTest {
         assertEquals(ID, response.getId());
         assertEquals(name, response.getName());
         assertEquals(email, response.getEmail());
+    }
+
+    @Test
+    void whenFindByIdThenReturnAnObjectNotFoundException() {
+        when(repository.findById(anyLong())).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+
+        try{
+            service.findById(ID);
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Objeto não encontrado", ex.getMessage());
+        }
     }
 
     @Test
