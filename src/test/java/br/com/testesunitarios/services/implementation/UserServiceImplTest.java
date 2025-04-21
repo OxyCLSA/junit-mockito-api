@@ -118,11 +118,52 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnSuccess() {
+        when(repository.save(Mockito.any())).thenReturn(user);
+
+        User response = service.update(userDTO);
+
+        assertNotNull(response);
+        assertEquals(User.class, response.getClass());
+        assertEquals(ID, response.getId());
+        assertEquals(name, response.getName());
+        assertEquals(email, response.getEmail());
+        assertEquals(password, response.getPassword());
+    }
+    @Test
+    void whenUpdateThenReturnDataIntegrityViolationException() {
+        when(repository.findByEmail(Mockito.anyString())).thenReturn(optionalUser);
+
+        try {
+            UserDTO differentIdDTO = new UserDTO(ID + 1, name, email, password);
+            service.update(differentIdDTO);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals("Email já cadastrado no sistema", ex.getMessage());
+        }
     }
 
     @Test
-    void delete() {
+    void deleteWithSuccess() {
+        when(repository.findById(anyLong())).thenReturn(optionalUser);
+
+        Mockito.doNothing().when(repository).deleteById(anyLong());
+
+        service.delete(ID);
+
+        Mockito.verify(repository, Mockito.times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    void deleteWithObjectNotFoundException() {
+        when(repository.findById(anyLong())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
+
+        try {
+            service.delete(ID);
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
+        }
     }
 
     private void startUser() {
