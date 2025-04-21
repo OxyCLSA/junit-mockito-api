@@ -3,6 +3,7 @@ package br.com.testesunitarios.services.implementation;
 import br.com.testesunitarios.domain.User;
 import br.com.testesunitarios.domain.dto.UserDTO;
 import br.com.testesunitarios.repositories.UserRepository;
+import br.com.testesunitarios.services.exceptions.DataIntegratyViolationException;
 import br.com.testesunitarios.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +92,29 @@ class UserServiceImplTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {
+        when(repository.save(Mockito.any())).thenReturn(user);
+
+        User response = service.create(userDTO);
+
+        assertNotNull(response);
+        assertEquals(User.class, response.getClass());
+        assertEquals(ID, response.getId());
+        assertEquals(name, response.getName());
+        assertEquals(email, response.getEmail());
+        assertEquals(password, response.getPassword());
+    }
+
+    @Test
+    void whenCreateThenReturnDataIntegrityViolationException() {
+        when(repository.findByEmail(Mockito.anyString())).thenReturn(optionalUser);
+
+        try {
+            service.create(userDTO);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals("Email já cadastrado no sistema", ex.getMessage());
+        }
     }
 
     @Test
