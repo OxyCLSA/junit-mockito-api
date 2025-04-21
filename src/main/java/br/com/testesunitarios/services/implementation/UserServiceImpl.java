@@ -1,9 +1,11 @@
 package br.com.testesunitarios.services.implementation;
 
 import br.com.testesunitarios.domain.User;
+import br.com.testesunitarios.domain.dto.UserDTO;
 import br.com.testesunitarios.repositories.UserRepository;
 import br.com.testesunitarios.services.UserService;
 import br.com.testesunitarios.services.exceptions.ObjectNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository repository;
 
+    @Autowired
+    private ModelMapper mapper;
+
     @Override
     public User findById(Long id) {
         Optional<User> obj = repository.findById(id);
@@ -24,5 +29,10 @@ public class UserServiceImpl implements UserService {
 
     public List<User> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public User create(UserDTO obj) {
+        return repository.save(mapper.map(obj, User.class));
     }
 }

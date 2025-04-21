@@ -18,16 +18,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+
     @Size(min = 2, max = 100)
     private String name;
 
-    @NotBlank
-    @Email
+
     @Column(unique = true)
     private String email;
 
-    @NotBlank
+
     @Size(min = 6, max = 100)
     private String password;
 }
